@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>짤·카드 스튜디오 (Meme & Card Studio)</title>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f7f3ef;
+            --panel-bg: #ffffff;
+            --primary-color: #9b6b7a;
+            --primary-hover: #825563;
+            --accent-color: #f4a261;
+            --accent-soft: #faedcd;
+            --text-main: #3d332d;
+            --text-sub: #7a6b63;
+            --border-color: #ebdcd4;
+            --shadow: 0 12px 32px rgba(155, 107, 122, 0.08);
+            --radius: 18px;
+            --danger: #e76f51;
+            --success: #2a9d8f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 18px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #f4a261, #e76f51);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(231, 111, 81, 0.2);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            padding: 9px 18px;
+            border-radius: 22px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(155, 107, 122, 0.04);
+        }
+
+        .nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(155, 107, 122, 0.25);
+        }
+
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 28px;
+            padding: 28px 36px;
+            max-width: 1560px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+        }
+
+        .control-panel {
+            background: var(--panel-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            background: #faf5f0;
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 12.5px;
+            color: var(--text-sub);
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .panel-content {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(100vh - 240px);
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .tab-pane {
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            background: #fdfaf7;
+            transition: all 0.25s ease;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary-color);
+            background: rgba(155, 107, 122, 0.02);
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .ratio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .ratio-btn {
+            padding: 10px 8px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .ratio-btn.active, .ratio-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(155, 107, 122, 0.06);
+            color: var(--primary-color);
+        }
+
+        input[type="text"], select, textarea, input[type="color"] {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13.5px;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(155, 107, 122, 0.12);
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .row-color {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="color"] {
+            width: 52px;
+            height: 42px;
+            padding: 3px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--primary-color);
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .preview-area {
+            background: var(--panel-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            font-weight: 700;
+            background: #faf5f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f7f3ef,
+                #f7f3ef 12px,
+                #efeae4 12px,
+                #efeae4 24px
+            );
+            min-height: 480px;
+            overflow: auto;
+        }
+
+        #renderCanvas {
+            max-width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            background: white;
+        }
+
+        .action-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+
+        .btn {
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(155, 107, 122, 0.2);
+        }
+        .btn-primary:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover { 
+            background: #faf6f5; 
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .list-card {
+            background: #fdfaf7;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .list-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .list-card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .badge {
+            font-size: 11.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .badge.pass { background: #e2f0d9; color: var(--success); }
+        .badge.fail { background: #fce8e6; color: var(--danger); }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: #3d332d;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .content-container {
+            padding: 40px;
+            max-width: 1080px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-container h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .content-container p {
+            color: var(--text-sub);
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    
+        /* ---- v4 추가 스타일 ---- */
+        :focus-visible { outline: 3px solid rgba(155, 107, 122, 0.55); outline-offset: 2px; }
+        button:disabled { opacity: 0.55; cursor: not-allowed; }
+        #renderCanvas { width: auto; height: auto; max-width: 100%; max-height: 72vh; }
+        .status { display: none; font-size: 12.5px; line-height: 1.5; padding: 10px 12px; border-radius: 10px; }
+        .status.ok { display: block; background: #e2f0d9; color: #1f6f64; }
+        .status.fail { display: block; background: #fce8e6; color: #b4452d; }
+        .layout-note { font-size: 12px; color: var(--text-sub); padding: 8px 24px; min-height: 34px; background: #fff; border-bottom: 1px solid var(--border-color); }
+        .list-card { gap: 12px; flex-wrap: wrap; }
+        .tpl-id { font-size: 11px; color: var(--text-sub); font-weight: 400; }
+        .tpl-sub { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+        .tpl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tpl-actions .btn { padding: 6px 12px; font-size: 12px; }
+        .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+        .test-summary { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
+        .test-detail { font-size: 12px; color: var(--text-sub); margin-top: 2px; line-height: 1.5; }
+        .action-footer { flex-wrap: wrap; gap: 12px; }
+        .action-footer .btn { white-space: nowrap; }
+        .action-footer > div { flex-wrap: wrap; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; }
+        output { font-size: 12px; color: var(--text-sub); font-weight: 600; }
+        @media (max-width: 640px) {
+            header { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .content-container { padding: 20px 16px; }
+            .canvas-container { padding: 16px; min-height: 320px; }
+            .action-footer { flex-direction: column; gap: 12px; align-items: stretch; }
+            .action-footer > div { flex-wrap: wrap; }
+            .layout-note { padding: 8px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">✨</div>
+            <div class="logo-text">짤·카드 스튜디오</div>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-tab="editor" onclick="switchMainTab('editor')">카드 편집기</button>
+            <button class="nav-btn" data-tab="templates" onclick="switchMainTab('templates')">템플릿 관리</button>
+            <button class="nav-btn" data-tab="extremes" onclick="switchMainTab('extremes')">극단 입력 12건 검사</button>
+            <button class="nav-btn" data-tab="jsonbox" onclick="switchMainTab('jsonbox')">JSON 복원·내보내기</button>
+        </div>
+    </header>
+
+    <div class="workspace" id="mainWorkspace">
+        <div class="control-panel">
+            <div class="panel-tabs">
+                <button class="tab-btn active" onclick="switchSubTab('sub-image', this)">1. 이미지/비율</button>
+                <button class="tab-btn" onclick="switchSubTab('sub-text', this)">2. 문구 설정</button>
+                <button class="tab-btn" onclick="switchSubTab('sub-style', this)">3. 스타일/위치</button>
+            </div>
+
+            <div class="panel-content">
+                <div id="sub-image" class="tab-pane active">
+                    <div class="control-group">
+                        <label class="section-title">🖼️ 이미지 파일 불러오기</label>
+                        <div class="upload-box" role="button" tabindex="0"
+                             onclick="document.getElementById('imageInput').click()"
+                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('imageInput').click();}">
+                            <input type="file" id="imageInput" accept="image/png, image/jpeg" onchange="handleImageUpload(event)">
+                            <div class="upload-text" id="uploadLabel">📁 클릭하여 PNG 또는 JPEG 업로드</div>
+                        </div>
+                        <div id="uploadStatus" class="status" role="status" aria-live="polite"></div>
+                        <small style="color: var(--text-sub); font-size: 11.5px; line-height: 1.4;">* PNG·JPEG만 허용(파일 내용으로 확인). 다른 형식이나 손상된 파일은 거부하고 기존 작업을 그대로 유지합니다. 큰 이미지는 자동으로 축소합니다.</small>
+                    </div>
+
+                    <div class="control-group">
+                        <label>📐 화면비 선택 (Aspect Ratio)</label>
+                        <div class="ratio-grid">
+                            <button class="ratio-btn active" data-ratio="1:1" onclick="setRatio('1:1')">1:1 (정사각형)</button>
+                            <button class="ratio-btn" data-ratio="4:5" onclick="setRatio('4:5')">4:5 (피드형)</button>
+                            <button class="ratio-btn" data-ratio="9:16" onclick="setRatio('9:16')">9:16 (스토리)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sub-text" class="tab-pane">
+                    <div class="control-group">
+                        <label for="inputTitle">✏️ 메인 상단 문구 (Title)</label>
+                        <input type="text" id="inputTitle" maxlength="200" oninput="drawCard()">
+                    </div>
+                    <div class="control-group">
+                        <label for="inputDesc">📝 하단 상세 문구 (Description)</label>
+                        <textarea id="inputDesc" rows="3" maxlength="1000" oninput="drawCard()"></textarea>
+                    </div>
+                    <div class="row-2">
+                        <div class="control-group">
+                            <div class="label-row"><label for="inputFontSize">🔤 폰트 크기</label><output id="outFontSize"></output></div>
+                            <input type="range" min="16" max="64" value="32" id="inputFontSize" oninput="drawCard()">
+                        </div>
+                        <div class="control-group">
+                            <label for="inputTextColor">🎨 텍스트 색상</label>
+                            <div class="row-color">
+                                <input type="color" id="inputTextColor" value="#ffffff" oninput="drawCard()">
+                                <span id="colorHexText" style="font-size:13px; font-weight:600; color:var(--text-sub);">#ffffff</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sub-style" class="tab-pane">
+                    <div class="control-group">
+                        <div class="label-row"><label for="inputPosY">↕️ 텍스트 박스 세로 위치 (Y Offset)</label><output id="outPosY"></output></div>
+                        <input type="range" min="50" max="90" value="80" id="inputPosY" oninput="drawCard()">
+                    </div>
+                    <div class="control-group">
+                        <div class="label-row"><label for="inputOverlay">🌑 배경 오버레이 투명도</label><output id="outOverlay"></output></div>
+                        <input type="range" min="0" max="80" value="40" id="inputOverlay" oninput="drawCard()">
+                    </div>
+                    <div class="control-group" style="margin-top: 12px;">
+                        <button class="btn btn-secondary" onclick="useSampleImage()">🎨 샘플 이미지 불러오기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-area">
+            <div class="preview-header">
+                <span id="previewHeaderTitle">Live Preview & Canvas</span>
+                <span id="dimensionBadge" style="font-size: 12px; background: #e2f0d9; color: var(--success); padding: 4px 10px; border-radius: 6px; font-weight:700;">내보내기 시 메타데이터 자동 제거</span>
+            </div>
+            <div class="layout-note" id="layoutNote" aria-live="polite"></div>
+
+            <div class="canvas-container">
+                <canvas id="renderCanvas" aria-label="카드 미리보기"></canvas>
+            </div>
+
+            <div class="action-footer">
+                <button class="btn btn-secondary" onclick="saveAsTemplate()">💾 현재 상태로 템플릿 저장</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="exportJSON()">🔄 JSON 내보내기</button>
+                    <button class="btn btn-secondary" onclick="downloadImage('jpeg')">⬇️ JPEG</button>
+                    <button class="btn btn-primary" onclick="downloadImage('png')">⬇️ 이미지 내려받기 (PNG)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pane-templates" class="content-container" style="display:none;">
+        <h2>📋 템플릿 관리 (생성·불러오기·수정·삭제)</h2>
+        <p>템플릿은 이 브라우저에 저장되어 새로고침해도 유지됩니다. 문구·비율·글자 크기·색상·위치·오버레이가 함께 저장됩니다. (이미지 파일은 저장하지 않습니다.)</p>
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+            <input type="text" id="newTemplateName" maxlength="60" placeholder="새 템플릿 이름을 입력하세요" style="flex: 1; min-width: 200px;">
+            <button class="btn btn-primary" onclick="createTemplate()">+ 현재 편집 내용으로 템플릿 추가</button>
+        </div>
+        <div id="templateListContainer"></div>
+    </div>
+
+    <div id="pane-extremes" class="content-container" style="display:none;">
+        <h2>🔍 극단 입력 12건 검사</h2>
+        <p>아래 12건은 이 페이지의 실제 렌더링·검증 함수를 열 때마다 직접 실행한 결과입니다. 측정값을 함께 표시합니다.</p>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="runTestsBtn" onclick="runExtremeTests()">▶ 12건 검사 다시 실행</button>
+            <span class="test-summary" id="testSummary" role="status" aria-live="polite"></span>
+        </div>
+        <div id="extremesListContainer"></div>
+    </div>
+
+    <div id="pane-jsonbox" class="content-container" style="display:none;">
+        <h2>⚙️ JSON 복원 및 유효성 검사</h2>
+        <p>정상 JSON은 템플릿과 현재 카드를 복원하고, 문법이 손상되었거나 필수 항목이 빠진 JSON은 거부하며 기존 작업을 바꾸지 않습니다.</p>
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+            <textarea id="jsonInputArea" rows="10" placeholder="JSON 데이터를 붙여넣으세요..." style="font-family: monospace; font-size: 13px; line-height: 1.5;"></textarea>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="importJSONData()">📥 JSON 가져오기 (복원 검증)</button>
+                <button class="btn btn-secondary" onclick="testInvalidJSON()">⚠️ 손상된 JSON 테스트</button>
+                <button class="btn btn-secondary" onclick="testMissingJSON()">❌ 필수항목 누락 테스트</button>
+                <button class="btn btn-secondary" onclick="downloadJSONFile()">💾 JSON 파일로 저장</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('jsonFileInput').click()">📂 JSON 파일 불러오기</button>
+                <input type="file" id="jsonFileInput" accept=".json,application/json" style="display:none" onchange="importJSONFile(event)">
+            </div>
+            <div id="jsonStatus" class="status" role="status" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toastMsg" role="status" aria-live="polite">알림 메시지</div>
+
+    <script>
+        'use strict';
+
+        /* ===== 상수 · 상태 ===== */
+        const RATIOS = {
+            '1:1':  { w: 1080, h: 1080 },
+            '4:5':  { w: 1080, h: 1350 },
+            '9:16': { w: 1080, h: 1920 }
+        };
+        const FONT_STACK = "'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Color Emoji','Apple Color Emoji','Segoe UI Emoji',sans-serif";
+        const DEFAULT_STYLE = { ratio: '1:1', fontSize: 32, textColor: '#ffffff', posY: 80, overlay: 40 };
+        const DEFAULT_CARD = Object.assign({
+            title: '오늘도 코딩 완주!',
+            desc: 'SKT ALEPH Academy 과제 수행 중 ✨\n12가지 극단 입력 테스트 완료!'
+        }, DEFAULT_STYLE);
+        const STORAGE_STATE = 'skt_card_state_v4';
+        const STORAGE_TPL = 'skt_card_templates';
+        const LIMITS = { title: 200, desc: 1000, name: 60, templates: 100, jsonChars: 1000000, imageBytes: 20 * 1024 * 1024, imageMaxSide: 1600 };
+
+        let currentRatio = '1:1';
+        let imageSource = null;      // { drawable, w, h, name, dataUrl }
+        let templates = [];
+        let toastTimer = null;
+        let persistTimer = null;
+        let testsRunning = false;
+
+        const $ = function (id) { return document.getElementById(id); };
+        const isRatio = function (r) { return typeof r === 'string' && Object.prototype.hasOwnProperty.call(RATIOS, r); };
+
+        /* ===== 저장소 유틸 ===== */
+        function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        function safeSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+        function safeRemove(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+        /* ===== UI 유틸 ===== */
+        function showToast(msg) {
+            const t = $('toastMsg');
+            t.textContent = msg;
+            t.style.display = 'block';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { t.style.display = 'none'; }, 3000);
+        }
+
+        function showStatus(id, msg, kind) {
+            const e = $(id);
+            e.textContent = msg;
+            e.className = 'status ' + kind;
+        }
+
+        function el(tag, cls) {
+            const e = document.createElement(tag);
+            if (cls) e.className = cls;
+            return e;
+        }
+
+        function switchMainTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(function (b) {
+                const on = b.dataset.tab === tabId;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            $('mainWorkspace').style.display = tabId === 'editor' ? 'grid' : 'none';
+            $('pane-templates').style.display = tabId === 'templates' ? 'block' : 'none';
+            $('pane-extremes').style.display = tabId === 'extremes' ? 'block' : 'none';
+            $('pane-jsonbox').style.display = tabId === 'jsonbox' ? 'block' : 'none';
+
+            if (tabId === 'editor') drawCard();
+            else if (tabId === 'templates') renderTemplateList();
+            else if (tabId === 'extremes') runExtremeTests();
+        }
+
+        function switchSubTab(subId, btn) {
+            const parent = btn.closest('.control-panel');
+            parent.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+            parent.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+            btn.classList.add('active');
+            $(subId).classList.add('active');
+        }
+
+        /* ===== 입력 검증 ===== */
+        function validateCard(c, opts) {
+            const o = opts || {};
+            if (!c || typeof c !== 'object' || Array.isArray(c)) return { ok: false, error: '객체 형식이 아닙니다.' };
+            if (typeof c.title !== 'string') return { ok: false, error: 'title(문자열) 항목이 필요합니다.' };
+            if (typeof c.desc !== 'string') return { ok: false, error: 'desc(문자열) 항목이 필요합니다.' };
+            if (c.title.length > LIMITS.title) return { ok: false, error: 'title이 ' + LIMITS.title + '자를 넘습니다.' };
+            if (c.desc.length > LIMITS.desc) return { ok: false, error: 'desc가 ' + LIMITS.desc + '자를 넘습니다.' };
+
+            let ratio = c.ratio;
+            if (ratio === undefined && !o.ratioRequired) ratio = DEFAULT_STYLE.ratio;
+            if (!isRatio(ratio)) return { ok: false, error: 'ratio는 1:1, 4:5, 9:16 중 하나여야 합니다.' };
+
+            const out = { title: c.title, desc: c.desc, ratio: ratio };
+            const nums = [['fontSize', 16, 64], ['posY', 50, 90], ['overlay', 0, 80]];
+            for (let i = 0; i < nums.length; i++) {
+                const k = nums[i][0], min = nums[i][1], max = nums[i][2];
+                const v = c[k];
+                if (v === undefined) { out[k] = DEFAULT_STYLE[k]; continue; }
+                if (typeof v !== 'number' || !isFinite(v)) return { ok: false, error: k + ' 값은 숫자여야 합니다.' };
+                out[k] = Math.min(max, Math.max(min, Math.round(v)));
+            }
+            if (c.textColor === undefined) out.textColor = DEFAULT_STYLE.textColor;
+            else if (typeof c.textColor !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(c.textColor)) return { ok: false, error: 'textColor는 #rrggbb 형식이어야 합니다.' };
+            else out.textColor = c.textColor.toLowerCase();
+            return { ok: true, value: out };
+        }
+
+        function validateTemplate(t) {
+            if (!t || typeof t !== 'object' || Array.isArray(t)) return { ok: false, error: '객체 형식이 아닙니다.' };
+            if (typeof t.name !== 'string' || !t.name.trim()) return { ok: false, error: 'name(문자열) 항목이 필요합니다.' };
+            if (t.name.trim().length > LIMITS.name) return { ok: false, error: 'name이 ' + LIMITS.name + '자를 넘습니다.' };
+            const r = validateCard(t);
+            if (!r.ok) return r;
+            const id = (typeof t.id === 'number' && isFinite(t.id)) ? t.id : null;
+            return { ok: true, value: Object.assign({ id: id, name: t.name.trim() }, r.value) };
+        }
+
+        function assignIds(list) {
+            const seen = new Set();
+            let max = 0;
+            list.forEach(function (t) { if (t.id !== null && t.id > max) max = t.id; });
+            list.forEach(function (t) {
+                if (t.id === null || seen.has(t.id)) t.id = ++max;
+                seen.add(t.id);
+            });
+        }
+
+        /* ===== 이미지 처리 ===== */
+        function normalizeImage(drawable, maxSide) {
+            const w = drawable.naturalWidth || drawable.width;
+            const h = drawable.naturalHeight || drawable.height;
+            const sc = Math.min(1, maxSide / Math.max(w, h));
+            const c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(w * sc));
+            c.height = Math.max(1, Math.round(h * sc));
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#ffffff';            // 투명 영역은 흰색으로 채움
+            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(drawable, 0, 0, c.width, c.height);
+            return c;
+        }
+
+        async function validateImageFile(file) {
+            if (!file) return { ok: false, reason: '파일이 선택되지 않았습니다.' };
+            if (file.size > LIMITS.imageBytes) return { ok: false, reason: '파일이 너무 큽니다. (최대 20MB)' };
+            const head = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+            const isPng = head.length >= 8 && head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47;
+            const isJpg = head.length >= 3 && head[0] === 0xFF && head[1] === 0xD8 && head[2] === 0xFF;
+            if (!isPng && !isJpg) {
+                return { ok: false, reason: 'PNG 또는 JPEG만 올릴 수 있습니다. (선택한 파일: ' + (file.name || '이름 없음') + ')' };
+            }
+            return { ok: true, kind: isPng ? 'png' : 'jpeg' };
+        }
+
+        function decodeFile(file) {
+            return new Promise(function (resolve, reject) {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+                img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('decode')); };
+                img.src = url;
+            });
+        }
+
+        // 성공했을 때만 imageSource를 교체한다. 실패하면 기존 이미지는 그대로 남는다.
+        async function processImageFile(file) {
+            const v = await validateImageFile(file);
+            if (!v.ok) return v;
+            let img;
+            try { img = await decodeFile(file); }
+            catch (e) { return { ok: false, reason: '이미지를 읽을 수 없습니다. 손상된 파일일 수 있습니다.' }; }
+            if (!img.naturalWidth || !img.naturalHeight) return { ok: false, reason: '이미지 크기를 확인할 수 없습니다.' };
+
+            const downscaled = Math.max(img.naturalWidth, img.naturalHeight) > LIMITS.imageMaxSide;
+            const c = normalizeImage(img, LIMITS.imageMaxSide);
+            let dataUrl = null;
+            try {
+                const d = c.toDataURL('image/jpeg', 0.85);
+                if (d.length < 2500000) dataUrl = d;
+            } catch (e) {}
+            imageSource = { drawable: c, w: c.width, h: c.height, name: file.name, dataUrl: dataUrl };
+            return { ok: true, name: file.name, w: c.width, h: c.height, downscaled: downscaled };
+        }
+
+        async function handleImageUpload(ev) {
+            const input = ev.target;
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const r = await processImageFile(file);
+            if (!r.ok) {
+                showStatus('uploadStatus', '[거부됨] ' + r.reason + ' 기존 작업은 그대로 유지됩니다.', 'fail');
+                showToast('업로드가 거부되었습니다.');
+            } else {
+                $('uploadLabel').textContent = '✅ 업로드 완료: ' + r.name;
+                showStatus('uploadStatus', '불러오기 완료 (' + r.w + '×' + r.h + 'px' + (r.downscaled ? ', 큰 이미지라 자동 축소' : '') + ')', 'ok');
+                showToast('이미지가 성공적으로 로드되었습니다.');
+                drawCard();
+            }
+            input.value = '';
+        }
+
+        function makeSampleCanvas() {
+            const c = document.createElement('canvas');
+            c.width = 1080; c.height = 1080;
+            const ctx = c.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 1080, 1080);
+            grad.addColorStop(0, '#f4a261');
+            grad.addColorStop(1, '#9b6b7a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 1080, 1080);
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+            ctx.font = 'bold 64px ' + FONT_STACK;
+            ctx.fillText('SKT ALEPH Academy', 540, 490);
+            ctx.font = '44px ' + FONT_STACK;
+            ctx.fillText('Meme & Card Studio ✨', 540, 570);
+            return c;
+        }
+
+        function makeSampleSource() {
+            const c = makeSampleCanvas();
+            return { drawable: c, w: c.width, h: c.height, name: '샘플', dataUrl: null };
+        }
+
+        function useSampleImage() {
+            imageSource = makeSampleSource();
+            $('uploadLabel').textContent = '📁 클릭하여 PNG 또는 JPEG 업로드';
+            drawCard();
+            showToast('샘플 이미지가 적용되었습니다.');
+        }
+
+        function restoreImage(saved) {
+            return new Promise(function (resolve, reject) {
+                const img = new Image();
+                img.onload = function () {
+                    resolve({ drawable: img, w: img.naturalWidth, h: img.naturalHeight, name: saved.name || '저장된 이미지', dataUrl: saved.dataUrl });
+                };
+                img.onerror = function () { reject(new Error('restore')); };
+                img.src = saved.dataUrl;
+            });
+        }
+
+        /* ===== 텍스트 배치 · 렌더링 ===== */
+        function wrapText(ctx, text, maxW) {
+            const out = [];
+            text.replace(/\r\n?/g, '\n').split('\n').forEach(function (par) {
+                if (par.trim() === '') { out.push(''); return; }
+                let line = '';
+                par.split(' ').forEach(function (tok) {
+                    const cand = line ? line + ' ' + tok : tok;
+                    if (ctx.measureText(cand).width <= maxW) { line = cand; return; }
+                    if (line) { out.push(line); line = ''; }
+                    if (ctx.measureText(tok).width <= maxW) { line = tok; return; }
+                    // 공백 없이 긴 단어는 글자 단위로 줄바꿈 (이모지 등 서로게이트 쌍 보호)
+                    Array.from(tok).forEach(function (ch) {
+                        const c2 = line + ch;
+                        if (!line || ctx.measureText(c2).width <= maxW) line = c2;
+                        else { out.push(line); line = ch; }
+                    });
+                });
+                out.push(line);
+            });
+            return out;
+        }
+
+        function fitEllipsis(ctx, line, maxW) {
+            const chars = Array.from(line);
+            while (chars.length && ctx.measureText(chars.join('') + '…').width > maxW) chars.pop();
+            return chars.join('') + '…';
+        }
+
+        function layoutText(ctx, W, H, st) {
+            const s = W / 600;
+            const pad = 40 * s;
+            const maxW = W - pad * 2;
+            const availH = H - pad * 2;
+            const fontOf = function (bold, size) { return (bold ? 'bold ' : '') + size + 'px ' + FONT_STACK; };
+
+            function build(k) {
+                const ts = st.fontSize * s * k;
+                const ds = Math.max(14 * s * k, (st.fontSize - 10) * s * k);
+                ctx.font = fontOf(true, ts);
+                const tl = st.title ? wrapText(ctx, st.title, maxW) : [];
+                ctx.font = fontOf(false, ds);
+                const dl = st.desc ? wrapText(ctx, st.desc, maxW) : [];
+                return { k: k, ts: ts, ds: ds, tl: tl, dl: dl, tLH: ts * 1.25, dLH: ds * 1.4 };
+            }
+            function total(o) {
+                return o.tl.length * o.tLH + o.dl.length * o.dLH + ((o.tl.length && o.dl.length) ? o.ts * 0.4 : 0);
+            }
+
+            let L = null;
+            for (let i = 20; i >= 6; i--) {           // 100% → 30%까지 글자를 줄여 가며 맞춤
+                L = build(i / 20);
+                if (total(L) <= availH) break;
+            }
+            let truncated = false;
+            if (total(L) > availH) {
+                truncated = true;
+                while (total(L) > availH && (L.dl.length > 0 || L.tl.length > 1)) {
+                    if (L.dl.length) L.dl.pop(); else L.tl.pop();
+                }
+                if (L.dl.length) { ctx.font = fontOf(false, L.ds); L.dl[L.dl.length - 1] = fitEllipsis(ctx, L.dl[L.dl.length - 1], maxW); }
+                else if (L.tl.length) { ctx.font = fontOf(true, L.ts); L.tl[L.tl.length - 1] = fitEllipsis(ctx, L.tl[L.tl.length - 1], maxW); }
+            }
+
+            const gap = (L.tl.length && L.dl.length) ? L.ts * 0.4 : 0;
+            const tot = total(L);
+            let startY = Math.min(H * st.posY / 100, H - pad - tot);
+            startY = Math.max(startY, pad);
+
+            let maxLineW = 0;
+            ctx.font = fontOf(true, L.ts);
+            L.tl.forEach(function (l) { maxLineW = Math.max(maxLineW, ctx.measureText(l).width); });
+            ctx.font = fontOf(false, L.ds);
+            L.dl.forEach(function (l) { maxLineW = Math.max(maxLineW, ctx.measureText(l).width); });
+
+            return {
+                k: L.k, ts: L.ts, ds: L.ds, tl: L.tl, dl: L.dl, tLH: L.tLH, dLH: L.dLH, gap: gap,
+                total: tot, startY: startY, bottom: startY + tot, pad: pad, maxW: maxW, maxLineW: maxLineW,
+                truncated: truncated, shrunk: L.k < 1, fontOf: fontOf
+            };
+        }
+
+        function renderCard(canvas, st, src) {
+            const dim = RATIOS[st.ratio] || RATIOS['1:1'];
+            const W = dim.w, H = dim.h;
+            canvas.width = W;
+            canvas.height = H;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, W, H);
+            if (src) {
+                const sc = Math.max(W / src.w, H / src.h);   // cover: 비율 유지하며 꽉 채우고 넘치는 부분은 잘라냄
+                const dw = src.w * sc, dh = src.h * sc;
+                ctx.drawImage(src.drawable, (W - dw) / 2, (H - dh) / 2, dw, dh);
+            } else {
+                ctx.fillStyle = '#f4ede6';
+                ctx.fillRect(0, 0, W, H);
+            }
+            if (st.overlay > 0) {
+                ctx.fillStyle = 'rgba(0,0,0,' + (st.overlay / 100) + ')';
+                ctx.fillRect(0, 0, W, H);
+            }
+
+            const lay = layoutText(ctx, W, H, st);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = st.textColor;
+            ctx.shadowColor = 'rgba(0,0,0,0.35)';
+            ctx.shadowBlur = 8 * (W / 600);
+            ctx.shadowOffsetY = 2 * (W / 600);
+
+            let y = lay.startY;
+            ctx.font = lay.fontOf(true, lay.ts);
+            lay.tl.forEach(function (l) { ctx.fillText(l, lay.pad, y); y += lay.tLH; });
+            y += lay.gap;
+            ctx.font = lay.fontOf(false, lay.ds);
+            lay.dl.forEach(function (l) { ctx.fillText(l, lay.pad, y); y += lay.dLH; });
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            return lay;
+        }
+
+        /* ===== 편집기 상태 ===== */
+        function getState() {
+            return {
+                title: $('inputTitle').value,
+                desc: $('inputDesc').value,
+                ratio: currentRatio,
+                fontSize: parseInt($('inputFontSize').value, 10),
+                textColor: $('inputTextColor').value,
+                posY: parseInt($('inputPosY').value, 10),
+                overlay: parseInt($('inputOverlay').value, 10)
+            };
+        }
+
+        function setStateToUI(st) {
+            $('inputTitle').value = st.title;
+            $('inputDesc').value = st.desc;
+            $('inputFontSize').value = st.fontSize;
+            $('inputTextColor').value = st.textColor;
+            $('inputPosY').value = st.posY;
+            $('inputOverlay').value = st.overlay;
+            setRatioButtons(st.ratio);
+        }
+
+        function setRatioButtons(name) {
+            currentRatio = name;
+            document.querySelectorAll('.ratio-btn').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.ratio === name);
+            });
+        }
+
+        function setRatio(name) {
+            if (!isRatio(name)) return;
+            setRatioButtons(name);
+            drawCard();
+        }
+
+        function drawCard() {
+            const st = getState();
+            const canvas = $('renderCanvas');
+            const lay = renderCard(canvas, st, imageSource);
+
+            $('colorHexText').textContent = st.textColor;
+            $('outFontSize').textContent = st.fontSize + 'px';
+            $('outPosY').textContent = st.posY + '%';
+            $('outOverlay').textContent = st.overlay + '%';
+            $('previewHeaderTitle').textContent = 'Live Preview & Canvas (' + st.ratio + ' · ' + canvas.width + '×' + canvas.height + ')';
+
+            let note = '';
+            if (lay.truncated) note = '문구가 영역보다 길어 일부를 …로 줄였습니다. 문구를 줄이거나 나눠 보세요.';
+            else if (lay.shrunk) note = '긴 문구에 맞춰 글자를 ' + Math.round(lay.k * 100) + '%로 자동 축소했습니다.';
+            $('layoutNote').textContent = note;
+
+            schedulePersist();
+        }
+
+        function schedulePersist() {
+            clearTimeout(persistTimer);
+            persistTimer = setTimeout(persistState, 300);
+        }
+
+        function persistState() {
+            const st = getState();
+            const withImg = Object.assign({}, st);
+            if (imageSource && imageSource.dataUrl) withImg.image = { dataUrl: imageSource.dataUrl, name: imageSource.name };
+            if (!safeSet(STORAGE_STATE, JSON.stringify(withImg))) safeSet(STORAGE_STATE, JSON.stringify(st));
+        }
+
+        function readState(key) {
+            const raw = safeGet(key || STORAGE_STATE);
+            if (!raw) return null;
+            try {
+                const obj = JSON.parse(raw);
+                const r = validateCard(obj);
+                if (!r.ok) return null;
+                const img = obj && obj.image;
+                const image = (img && typeof img.dataUrl === 'string' && img.dataUrl.indexOf('data:image/') === 0) ? img : null;
+                return { value: r.value, image: image };
+            } catch (e) { return null; }
+        }
+
+        /* ===== 내보내기 · 메타데이터 검사 ===== */
+        function canvasToBlob(canvas, type, q) {
+            return new Promise(function (resolve) { canvas.toBlob(resolve, type, q); });
+        }
+
+        function parsePng(buf) {
+            const u = new Uint8Array(buf), v = new DataView(buf);
+            let p = 8, w = 0, h = 0;
+            const types = [];
+            while (p + 8 <= u.length) {
+                const len = v.getUint32(p);
+                const type = String.fromCharCode(u[p + 4], u[p + 5], u[p + 6], u[p + 7]);
+                if (type === 'IHDR') { w = v.getUint32(p + 8); h = v.getUint32(p + 12); }
+                types.push(type);
+                p += 12 + len;
+                if (type === 'IEND') break;
+            }
+            const found = types.filter(function (t) { return ['tEXt', 'zTXt', 'iTXt', 'eXIf', 'tIME'].indexOf(t) >= 0; });
+            return { format: 'png', width: w, height: h, metaCount: found.length, metaTypes: found };
+        }
+
+        function parseJpeg(buf) {
+            const u = new Uint8Array(buf);
+            let p = 2, w = 0, h = 0;
+            const found = [];
+            while (p + 4 <= u.length) {
+                if (u[p] !== 0xFF) { p++; continue; }
+                const m = u[p + 1];
+                if (m === 0xFF) { p++; continue; }
+                if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { p += 2; continue; }
+                if (m === 0xD9) break;
+                const len = (u[p + 2] << 8) | u[p + 3];
+                if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+                    h = (u[p + 5] << 8) | u[p + 6];
+                    w = (u[p + 7] << 8) | u[p + 8];
+                }
+                if (m === 0xE1 || m === 0xED || m === 0xFE) found.push('0x' + m.toString(16).toUpperCase()); // EXIF/XMP, IPTC, 주석
+                if (m === 0xDA) break;
+                p += 2 + len;
+            }
+            return { format: 'jpeg', width: w, height: h, metaCount: found.length, metaTypes: found };
+        }
+
+        function inspectImageMeta(buf) {
+            const u = new Uint8Array(buf);
+            if (u.length > 8 && u[0] === 0x89 && u[1] === 0x50) return parsePng(buf);
+            if (u.length > 3 && u[0] === 0xFF && u[1] === 0xD8) return parseJpeg(buf);
+            return { format: 'unknown', width: 0, height: 0, metaCount: -1, metaTypes: [] };
+        }
+
+        function setMetaBadge(text, ok) {
+            const b = $('dimensionBadge');
+            b.textContent = text;
+            b.style.background = ok ? '#e2f0d9' : '#fce8e6';
+            b.style.color = ok ? 'var(--success)' : 'var(--danger)';
+        }
+
+        function triggerDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+        }
+
+        async function downloadImage(kind) {
+            drawCard();
+            const isPng = kind !== 'jpeg';
+            const canvas = $('renderCanvas');
+            const blob = await canvasToBlob(canvas, isPng ? 'image/png' : 'image/jpeg', 0.92);
+            if (!blob) { showToast('이미지를 만들지 못했습니다. 다시 시도해 주세요.'); return; }
+            const meta = inspectImageMeta(await blob.arrayBuffer());
+            const ok = meta.metaCount === 0;
+            setMetaBadge('마지막 내보내기 검사: 메타데이터 ' + (meta.metaCount < 0 ? '확인 불가' : meta.metaCount + '건'), ok);
+            triggerDownload(blob, 'meme-card-' + currentRatio.replace(':', '-') + '-' + Date.now() + (isPng ? '.png' : '.jpg'));
+            showToast(ok ? '내려받기 완료 (메타데이터 0건 확인)' : '내려받기 완료 (메타데이터가 남아 있을 수 있어요)');
+        }
+
+        /* ===== 템플릿 ===== */
+        function seedTemplates() {
+            return [
+                { id: 1, name: '기본 밈 템플릿', title: '오늘도 코딩 완주!', desc: 'SKT ALEPH Academy', ratio: '1:1', fontSize: 32, textColor: '#ffffff', posY: 80, overlay: 40 },
+                { id: 2, name: '열공 인증 템플릿', title: 'SQLD 합격 기원 🔥', desc: '개념 완주 및 기출 풀이', ratio: '4:5', fontSize: 36, textColor: '#faedcd', posY: 75, overlay: 50 },
+                { id: 3, name: '프로젝트 발표용', title: '팀 프로젝트 데모데이', desc: 'AI 헬스케어 챗봇 서비스', ratio: '9:16', fontSize: 40, textColor: '#ffffff', posY: 70, overlay: 30 }
+            ];
+        }
+
+        function loadTemplates() {
+            const raw = safeGet(STORAGE_TPL);
+            if (raw) {
+                try {
+                    const arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) {
+                        const out = [];
+                        arr.forEach(function (t) { const r = validateTemplate(t); if (r.ok) out.push(r.value); });
+                        assignIds(out);
+                        return out;
+                    }
+                } catch (e) {}
+            }
+            return seedTemplates();
+        }
+
+        function saveTemplates() {
+            if (!safeSet(STORAGE_TPL, JSON.stringify(templates))) {
+                showToast('브라우저 저장소를 쓸 수 없어 새로고침 후에는 유지되지 않을 수 있습니다.');
+                return false;
+            }
+            return true;
+        }
+
+        function nextTemplateId() {
+            return templates.reduce(function (m, t) { return Math.max(m, t.id); }, 0) + 1;
+        }
+
+        function askTemplateName(defaultName) {
+            const input = prompt('템플릿 이름을 입력하세요 (최대 ' + LIMITS.name + '자):', defaultName);
+            if (input === null) return null;
+            const name = input.trim();
+            if (!name) { showToast('이름을 비워 둘 수 없습니다.'); return null; }
+            if (name.length > LIMITS.name) { showToast('이름은 ' + LIMITS.name + '자 이하로 입력하세요.'); return null; }
+            return name;
+        }
+
+        function addTemplate(name) {
+            if (templates.length >= LIMITS.templates) { showToast('템플릿은 최대 ' + LIMITS.templates + '개까지 저장할 수 있습니다.'); return false; }
+            templates.push(Object.assign({ id: nextTemplateId(), name: name }, getState()));
+            saveTemplates();
+            return true;
+        }
+
+        function renderTemplateList() {
+            const box = $('templateListContainer');
+            box.replaceChildren();
+            if (!templates.length) {
+                const p = el('p');
+                p.textContent = '저장된 템플릿이 없습니다. 위에서 이름을 입력해 추가해 보세요.';
+                box.appendChild(p);
+                return;
+            }
+            templates.forEach(function (t) {
+                const card = el('div', 'list-card');
+                const left = el('div');
+                const title = el('div', 'list-card-title');
+                title.textContent = t.name + ' ';
+                const meta = el('span', 'tpl-id');
+                meta.textContent = '(ID: ' + t.id + ' · ' + t.ratio + ')';
+                title.appendChild(meta);
+                const sub = el('div', 'tpl-sub');
+                sub.textContent = '제목: ' + (t.title || '(비어 있음)');
+                left.append(title, sub);
+
+                const actions = el('div', 'tpl-actions');
+                [
+                    ['불러오기', 'btn-secondary', function () { loadTemplate(t.id); }],
+                    ['이름 수정', 'btn-secondary', function () { renameTemplate(t.id); }],
+                    ['현재 내용으로 덮어쓰기', 'btn-secondary', function () { overwriteTemplate(t.id); }],
+                    ['삭제', 'btn-danger', function () { deleteTemplate(t.id); }]
+                ].forEach(function (a) {
+                    const b = el('button', 'btn ' + a[1]);
+                    b.textContent = a[0];
+                    b.addEventListener('click', a[2]);
+                    actions.appendChild(b);
+                });
+                card.append(left, actions);
+                box.appendChild(card);
+            });
+        }
+
+        function createTemplate() {
+            const input = $('newTemplateName');
+            const name = input.value.trim();
+            if (!name) { showToast('템플릿 이름을 입력하세요.'); input.focus(); return; }
+            if (name.length > LIMITS.name) { showToast('이름은 ' + LIMITS.name + '자 이하로 입력하세요.'); return; }
+            if (addTemplate(name)) {
+                input.value = '';
+                renderTemplateList();
+                showToast('새 템플릿이 생성되었습니다.');
+            }
+        }
+
+        function loadTemplate(id) {
+            const t = templates.find(function (x) { return x.id === id; });
+            if (!t) return;
+            setStateToUI(t);
+            switchMainTab('editor');
+            showToast('템플릿 "' + t.name + '" 불러오기 완료!');
+        }
+
+        function renameTemplate(id) {
+            const t = templates.find(function (x) { return x.id === id; });
+            if (!t) return;
+            const name = askTemplateName(t.name);
+            if (name === null) return;
+            t.name = name;
+            saveTemplates();
+            renderTemplateList();
+            showToast('템플릿 이름이 수정되었습니다.');
+        }
+
+        function overwriteTemplate(id) {
+            const t = templates.find(function (x) { return x.id === id; });
+            if (!t) return;
+            if (!confirm('"' + t.name + '" 템플릿을 현재 편집기 내용으로 덮어쓸까요?')) return;
+            Object.assign(t, getState());
+            saveTemplates();
+            renderTemplateList();
+            showToast('템플릿 내용이 수정되었습니다.');
+        }
+
+        function deleteTemplate(id) {
+            const t = templates.find(function (x) { return x.id === id; });
+            if (!t) return;
+            if (!confirm('"' + t.name + '" 템플릿을 삭제할까요?')) return;
+            templates = templates.filter(function (x) { return x.id !== id; });
+            saveTemplates();
+            renderTemplateList();
+            showToast('템플릿이 삭제되었습니다.');
+        }
+
+        function saveAsTemplate() {
+            const name = askTemplateName('내 맞춤 템플릿');
+            if (name === null) return;
+            if (addTemplate(name)) showToast('현재 편집 내용이 템플릿으로 저장되었습니다.');
+        }
+
+        /* ===== JSON 내보내기 · 가져오기 ===== */
+        function buildExport() {
+            return { version: '1.1', exportedAt: new Date().toISOString(), templates: templates, currentCard: getState() };
+        }
+
+        function exportJSON() {
+            $('jsonInputArea').value = JSON.stringify(buildExport(), null, 2);
+            showStatus('jsonStatus', '현재 상태를 JSON으로 내보냈습니다. (이미지 파일은 포함되지 않습니다.)', 'ok');
+            switchMainTab('jsonbox');
+            showToast('현재 상태가 JSON으로 내보내기 되었습니다.');
+        }
+
+        function downloadJSONFile() {
+            const text = $('jsonInputArea').value.trim() || JSON.stringify(buildExport(), null, 2);
+            triggerDownload(new Blob([text], { type: 'application/json' }), 'meme-card-export.json');
+            showToast('JSON 파일을 저장했습니다.');
+        }
+
+        function parseImport(raw) {
+            const fail = function (msg) { return { ok: false, error: msg }; };
+            if (typeof raw !== 'string' || raw.trim() === '') return fail('입력이 비어 있습니다.');
+            if (raw.length > LIMITS.jsonChars) return fail('JSON이 너무 큽니다.');
+            let obj;
+            try { obj = JSON.parse(raw); }
+            catch (e) { return fail('JSON 문법이 손상되었습니다. (' + e.message + ')'); }
+            if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return fail('최상위 값은 객체여야 합니다.');
+
+            const missing = ['templates', 'currentCard'].filter(function (k) { return !(k in obj); });
+            if (missing.length) return fail('필수 항목이 누락되었습니다: ' + missing.join(', '));
+            if (!Array.isArray(obj.templates)) return fail('templates는 배열이어야 합니다.');
+            if (obj.templates.length > LIMITS.templates) return fail('templates는 최대 ' + LIMITS.templates + '개입니다.');
+
+            const list = [];
+            for (let i = 0; i < obj.templates.length; i++) {
+                const r = validateTemplate(obj.templates[i]);
+                if (!r.ok) return fail('templates[' + i + ']: ' + r.error);
+                list.push(r.value);
+            }
+            assignIds(list);
+            const c = validateCard(obj.currentCard, { ratioRequired: true });
+            if (!c.ok) return fail('currentCard: ' + c.error);
+            return { ok: true, templates: list, card: c.value };
+        }
+
+        // 전체 검증이 끝난 뒤에만 상태를 바꾼다. 실패하면 아무것도 바뀌지 않는다.
+        function importJSONData() {
+            const r = parseImport($('jsonInputArea').value);
+            if (!r.ok) {
+                showStatus('jsonStatus', '[거부됨] ' + r.error + ' 기존 작업은 그대로 유지됩니다.', 'fail');
+                showToast('JSON 가져오기가 거부되었습니다.');
+                return;
+            }
+            templates = r.templates;
+            saveTemplates();
+            setStateToUI(r.card);
+            drawCard();
+            showStatus('jsonStatus', '[복원 완료] 템플릿 ' + r.templates.length + '개와 현재 카드(' + r.card.ratio + ')를 복원했습니다. 편집기 탭에서 확인하세요.', 'ok');
+            showToast('JSON 복원 완료');
+        }
+
+        function importJSONFile(ev) {
+            const input = ev.target;
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (file.size > LIMITS.jsonChars) {
+                showStatus('jsonStatus', '[거부됨] 파일이 너무 큽니다. 기존 작업은 그대로 유지됩니다.', 'fail');
+                input.value = '';
+                return;
+            }
+            file.text().then(function (text) {
+                $('jsonInputArea').value = text;
+                importJSONData();
+            }).catch(function () {
+                showStatus('jsonStatus', '[거부됨] 파일을 읽지 못했습니다. 기존 작업은 그대로 유지됩니다.', 'fail');
+            });
+            input.value = '';
+        }
+
+        function testInvalidJSON() {
+            $('jsonInputArea').value = '{ "templates": [ { invalid json syntax ... ';
+            importJSONData();
+        }
+
+        function testMissingJSON() {
+            $('jsonInputArea').value = JSON.stringify({ version: '1.1' }, null, 2);
+            importJSONData();
+        }
+
+        /* ===== 극단 입력 12건: 실제 실행 검사 ===== */
+        function mkState(over) {
+            return Object.assign({ title: '', desc: '' }, DEFAULT_STYLE, over || {});
+        }
+
+        function testRender(st, src) {
+            const canvas = document.createElement('canvas');
+            const lay = renderCard(canvas, st, src === undefined ? makeSampleSource() : src);
+            return { canvas: canvas, lay: lay, H: canvas.height, W: canvas.width };
+        }
+
+        function fitReport(t) {
+            const lay = t.lay;
+            const fitsW = lay.maxLineW <= lay.maxW + 0.5;
+            const fitsH = lay.bottom <= t.H + 0.5 && lay.startY >= 0;
+            return {
+                pass: fitsW && fitsH && !lay.truncated,
+                detail: (lay.tl.length + lay.dl.length) + '줄, 최대 줄 폭 ' + Math.round(lay.maxLineW) + '/' + Math.round(lay.maxW) + 'px, 하단 ' + Math.round(lay.bottom) + '/' + t.H + 'px' + (lay.shrunk ? ', 글자 ' + Math.round(lay.k * 100) + '%로 자동 축소' : '')
+            };
+        }
+
+        function ratioTest(name) {
+            return async function () {
+                const t = testRender(mkState({ title: '비율 검사', desc: name + ' 캔버스', ratio: name }));
+                const exp = RATIOS[name];
+                const pb = await canvasToBlob(t.canvas, 'image/png');
+                const jb = await canvasToBlob(t.canvas, 'image/jpeg', 0.92);
+                if (!pb || !jb) return { pass: false, detail: '이미지 인코딩 실패' };
+                const pm = inspectImageMeta(await pb.arrayBuffer());
+                const jm = inspectImageMeta(await jb.arrayBuffer());
+                const pass = t.W === exp.w && t.H === exp.h && pm.width === exp.w && pm.height === exp.h && jm.width === exp.w && jm.height === exp.h && pm.metaCount === 0 && jm.metaCount === 0;
+                return { pass: pass, detail: '캔버스 ' + t.W + '×' + t.H + ', PNG ' + pm.width + '×' + pm.height + '(메타 ' + pm.metaCount + '건), JPEG ' + jm.width + '×' + jm.height + '(메타 ' + jm.metaCount + '건)' };
+            };
+        }
+
+        const EXTREME_TESTS = [
+            { title: '긴 한글 제목 (공백 없이 75자)', run: async function () {
+                return fitReport(testRender(mkState({ title: '공백없이이어지는아주긴한글제목'.repeat(5) })));
+            } },
+            { title: '영문 대소문자·숫자 혼합 (공백 없는 120자 포함)', run: async function () {
+                return fitReport(testRender(mkState({ title: 'Ab1'.repeat(40), desc: 'Hello World ABCdef GHI 0123456789 ' + 'xY9'.repeat(30) })));
+            } },
+            { title: '다중 줄바꿈 (12줄 + 빈 줄 1개)', run: async function () {
+                const lines = [];
+                for (let i = 1; i <= 12; i++) lines.push(i + '번째 줄');
+                lines.splice(6, 0, '');
+                const t = testRender(mkState({ title: '다중 줄바꿈', desc: lines.join('\n') }));
+                const r = fitReport(t);
+                r.pass = r.pass && t.lay.dl.length === 13;
+                r.detail = '설명 ' + t.lay.dl.length + '줄(기대 13줄), ' + r.detail;
+                return r;
+            } },
+            { title: '특수문자·이모지', run: async function () {
+                const t = testRender(mkState({ title: '🔥✨ 특수문자 !@#$%^&*()_+ <b>', desc: 'emoji 😀👍🏻 ♥ “따옴표” \\ / &amp;' }));
+                const r = fitReport(t);
+                r.detail += ' · 렌더 예외 없음 (이모지 글리프 모양은 기기 폰트에 따라 다를 수 있음)';
+                return r;
+            } },
+            { title: '빈 문구 (제목·설명 모두 비움)', run: async function () {
+                const t = testRender(mkState({ title: '', desc: '' }));
+                const px = t.canvas.getContext('2d').getImageData(t.W >> 1, t.H >> 1, 1, 1).data;
+                return { pass: t.lay.tl.length === 0 && t.lay.dl.length === 0 && px[3] === 255, detail: '문구 줄 0개, 중앙 픽셀 알파 ' + px[3] + ' (배경 이미지 정상 유지)' };
+            } },
+            { title: '1:1 비율 · PNG/JPEG 출력 크기·메타데이터', run: ratioTest('1:1') },
+            { title: '4:5 비율 · PNG/JPEG 출력 크기·메타데이터', run: ratioTest('4:5') },
+            { title: '9:16 비율 · PNG/JPEG 출력 크기·메타데이터', run: ratioTest('9:16') },
+            { title: '투명 PNG → 흰 배경 보정', run: async function () {
+                const tc = document.createElement('canvas');
+                tc.width = 200; tc.height = 100;                       // 아무것도 안 그린 완전 투명 이미지
+                const norm = normalizeImage(tc, LIMITS.imageMaxSide);
+                const src = { drawable: norm, w: norm.width, h: norm.height };
+                const t = testRender(mkState({ overlay: 0 }), src);
+                const d = t.canvas.getContext('2d').getImageData(5, 5, 1, 1).data;
+                const pass = d[0] === 255 && d[1] === 255 && d[2] === 255 && d[3] === 255;
+                return { pass: pass, detail: '모서리 픽셀 RGBA = (' + Array.prototype.join.call(d, ', ') + ')' };
+            } },
+            { title: '.txt·가짜 PNG·손상 PNG 차단 + 기존 작업 유지', run: async function () {
+                const before = imageSource;
+                const txt = await processImageFile(new File(['hello text'], 'memo.txt', { type: 'text/plain' }));
+                const fake = await processImageFile(new File(['not really a png'], 'fake.png', { type: 'image/png' }));
+                const head = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                const broken = await processImageFile(new File([new Uint8Array(head)], 'broken.png', { type: 'image/png' }));
+                const pass = !txt.ok && !fake.ok && !broken.ok && imageSource === before;
+                return { pass: pass, detail: 'txt 거부=' + !txt.ok + ', 가짜 PNG 거부=' + !fake.ok + ', 손상 PNG 거부=' + !broken.ok + ', 기존 이미지 유지=' + (imageSource === before) };
+            } },
+            { title: '대용량 이미지 (4000×3000) 자동 축소', run: async function () {
+                const big = document.createElement('canvas');
+                big.width = 4000; big.height = 3000;
+                big.getContext('2d').fillRect(0, 0, 10, 10);
+                const t0 = performance.now();
+                const n = normalizeImage(big, LIMITS.imageMaxSide);
+                const ms = Math.round(performance.now() - t0);
+                const ratioOk = Math.abs(n.width / n.height - 4000 / 3000) < 0.01;
+                return { pass: Math.max(n.width, n.height) <= LIMITS.imageMaxSide && ratioOk, detail: '4000×3000 → ' + n.width + '×' + n.height + ' (비율 유지 ' + ratioOk + '), ' + ms + 'ms' };
+            } },
+            { title: '새로고침 후 상태 유지 (저장소 왕복 + 템플릿 저장 확인)', run: async function () {
+                const key = 'skt_card_state_selftest';
+                const st = { title: '새로고침 테스트 🔥', desc: 'a\nb', ratio: '9:16', fontSize: 40, textColor: '#112233', posY: 60, overlay: 10 };
+                if (!safeSet(key, JSON.stringify(st))) return { pass: false, detail: '브라우저 저장소(localStorage)를 쓸 수 없습니다.' };
+                const back = readState(key);
+                safeRemove(key);
+                const same = !!back && Object.keys(st).every(function (k) { return back.value[k] === st[k]; });
+                let tplSame = false;
+                try { tplSame = JSON.stringify(JSON.parse(safeGet(STORAGE_TPL))) === JSON.stringify(templates); } catch (e) {}
+                return { pass: same && tplSame, detail: '편집 상태 왕복 일치=' + same + ', 저장된 템플릿 ' + templates.length + '개와 메모리 일치=' + tplSame + ' (실제 F5 새로고침으로도 확인해 보세요)' };
+            } }
+        ];
+
+        async function runExtremeTests() {
+            if (testsRunning) return;
+            testsRunning = true;
+            const btn = $('runTestsBtn');
+            btn.disabled = true;
+            $('testSummary').textContent = '검사 중...';
+            const box = $('extremesListContainer');
+            box.replaceChildren();
+            try { await document.fonts.ready; } catch (e) {}
+
+            let passCount = 0;
+            for (let i = 0; i < EXTREME_TESTS.length; i++) {
+                const tst = EXTREME_TESTS[i];
+                let res;
+                try { res = await tst.run(); }
+                catch (e) { res = { pass: false, detail: '예외 발생: ' + (e && e.message ? e.message : e) }; }
+                if (res.pass) passCount++;
+
+                const card = el('div', 'list-card');
+                const left = el('div');
+                const title = el('div', 'list-card-title');
+                title.textContent = '#' + (i + 1) + '. ' + tst.title;
+                const detail = el('div', 'test-detail');
+                detail.textContent = res.detail;
+                left.append(title, detail);
+                const badge = el('span', 'badge ' + (res.pass ? 'pass' : 'fail'));
+                badge.textContent = res.pass ? 'PASS' : 'FAIL';
+                card.append(left, badge);
+                box.appendChild(card);
+            }
+            $('testSummary').textContent = EXTREME_TESTS.length + '건 중 ' + passCount + '건 PASS' + (passCount === EXTREME_TESTS.length ? ' ✅' : ' — FAIL 항목을 확인하세요');
+            btn.disabled = false;
+            testsRunning = false;
+        }
+
+        /* ===== 시작 ===== */
+        function ensureFonts() {
+            if (!document.fonts || !document.fonts.load) return;
+            Promise.all([
+                document.fonts.load('400 32px Pretendard', '가A'),
+                document.fonts.load('700 32px Pretendard', '가A')
+            ]).then(function () { drawCard(); }).catch(function () {});
+        }
+
+        window.addEventListener('DOMContentLoaded', async function () {
+            templates = loadTemplates();
+            saveTemplates();
+
+            const saved = readState(STORAGE_STATE);
+            setStateToUI(saved ? saved.value : DEFAULT_CARD);
+            imageSource = null;
+            if (saved && saved.image) {
+                try { imageSource = await restoreImage(saved.image); } catch (e) { imageSource = null; }
+            }
+            if (!imageSource) imageSource = makeSampleSource();
+            drawCard();
+            ensureFonts();
+        });
+    </script>
+</body>
+</html>
